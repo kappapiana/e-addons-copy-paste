@@ -25,10 +25,10 @@ if (!defined('ABSPATH')) {
  *
  */
 class Button extends Base_Widget {
-    
+
     public function __construct($data = [], $args = null) {
-       parent::__construct($data, $args);
-       $this->register_script('assets/lib/clipboard.js/clipboard.min.js'); // from module folder
+        parent::__construct($data, $args);
+        $this->register_script('assets/lib/clipboard.js/clipboard.min.js'); // from module folder
     }
 
     public function get_name() {
@@ -44,7 +44,7 @@ class Button extends Base_Widget {
     }
 
     public function get_categories() {
-		return [ 'buttons' ];
+        return ['buttons'];
     }
 
     public function get_pid() {
@@ -174,7 +174,7 @@ class Button extends Base_Widget {
                     'options' => [
                         'left' => __('Before', 'elementor'),
                         'right' => __('After', 'elementor'),
-                    ],                    
+                    ],
                     'condition' => [
                         'selected_icon[value]!' => '',
                     ],
@@ -432,21 +432,21 @@ class Button extends Base_Widget {
                     'toggle' => false,
                 ]
         );
-        
+
         $this->add_control(
                 'e_clipboard_visible', [
             'label' => __('Show Content', 'e-addons'),
             'type' => Controls_Manager::CHOOSE,
-                    'options' => [
-                        'yes' => [
-                            'title' => __('Yes', 'e-addons'),
-                            'icon' => 'fa fa-eye',
-                        ],
-                        'no' => [
-                            'title' => __('No', 'e-addons'),
-                            'icon' => 'fa fa-eye-slash',
-                        ],                        
-                    ],
+            'options' => [
+                'yes' => [
+                    'title' => __('Yes', 'e-addons'),
+                    'icon' => 'fa fa-eye',
+                ],
+                'no' => [
+                    'title' => __('No', 'e-addons'),
+                    'icon' => 'fa fa-eye-slash',
+                ],
+            ],
             'default' => 'yes',
             'toggle' => false,
             'render_type' => 'template',
@@ -469,6 +469,14 @@ class Button extends Base_Widget {
             ]
                 ]
         );
+
+        $this->add_control(
+                'e_clipboard_entities', [
+            'label' => __('HtmlEntities', 'e-addons'),
+            'type' => Controls_Manager::SWITCHER,
+                ]
+        );
+
 
         // title
         $this->add_control(
@@ -498,7 +506,7 @@ class Button extends Base_Widget {
             'label' => __('Code', 'e-addons'),
             'type' => Controls_Manager::CODE,
             'label_block' => true,
-            'default' => "<?php".PHP_EOL."echo 'Hello World!';",
+            'default' => "<?php" . PHP_EOL . "echo 'Hello World!';",
             'condition' => [
                 'e_clipboard_type' => 'code',
             ]
@@ -769,7 +777,7 @@ class Button extends Base_Widget {
                 [
                     'label' => __('Top', 'elementor'),
                     'type' => Controls_Manager::SLIDER,
-                    'size_units' => [ 'px', 'em', '%' ],
+                    'size_units' => ['px', 'em', '%'],
                     'range' => [
                         'px' => [
                             'max' => 50,
@@ -793,7 +801,7 @@ class Button extends Base_Widget {
                 [
                     'label' => __('Right', 'elementor'),
                     'type' => Controls_Manager::SLIDER,
-                    'size_units' => [ 'px', 'em', '%' ],
+                    'size_units' => ['px', 'em', '%'],
                     'range' => [
                         'px' => [
                             'max' => 50,
@@ -854,6 +862,9 @@ class Button extends Base_Widget {
      */
     protected function render() {
         $settings = $this->get_settings_for_display();
+        //$settings = Utils::get_settings_by_element_id($this->get_id(), get_the_ID());
+        //$settings = $meta = get_post_meta( get_the_ID(), '_elementor_data', true );        
+        //echo '<pre>';var_dump($settings);echo '</pre>';
 
         $this->add_render_attribute('wrapper', 'class', 'e-clipboard-wrapper');
         $this->add_render_attribute('wrapper', 'class', 'e-clipboard-wrapper-' . $settings['e_clipboard_type']);
@@ -923,23 +934,29 @@ class Button extends Base_Widget {
         }
         ?>
         <div <?php echo $this->get_render_attribute_string('wrapper'); ?>>
-        <?php
-        if ($settings['e_clipboard_type'] == 'text') {
-            $this->add_render_attribute('input', 'type', 'text');
-            $this->add_render_attribute('input', 'value', $settings['e_clipboard_text']);
-            $this->add_render_attribute('input', 'class', 'e-form-control');
-            ?>
+            <?php
+            if ($settings['e_clipboard_type'] == 'text') {
+
+                $value = $settings['e_clipboard_text'];
+                if (!empty($settings['e_clipboard_entities'])) {
+                    $value = htmlentities($value);
+                }
+
+                $this->add_render_attribute('input', 'type', 'text');
+                $this->add_render_attribute('input', 'value', $value);
+                $this->add_render_attribute('input', 'class', 'e-form-control');
+                ?>
                 <?php if ($settings['align'] != 'right') { ?>
                     <div <?php echo $this->get_render_attribute_string('wrapper-btn'); ?>>       
-                    <?php $this->render_text(); ?>              
+                        <?php $this->render_button(); ?>              
                     </div>
                 <?php } ?>
                 <input <?php echo $this->get_render_attribute_string('input'); ?>>            
-                    <?php if ($settings['align'] == 'right') { ?>
+                <?php if ($settings['align'] == 'right') { ?>
                     <div <?php echo $this->get_render_attribute_string('wrapper-btn'); ?>>       
-                    <?php $this->render_text(); ?>              
+                        <?php $this->render_button(); ?>              
                     </div>
-                <?php
+                    <?php
                 }
             }
 
@@ -950,10 +967,14 @@ class Button extends Base_Widget {
                     $this->add_render_attribute('input', 'class', 'e-codemirror');
                     $this->add_render_attribute('input', 'data-code', $code_settings);
                 }
+                $value = $settings['e_clipboard_type'] == 'textarea' ? $settings['e_clipboard_textarea'] : $settings['e_clipboard_code'];
+                if (!empty($settings['e_clipboard_entities'])) {
+                    $value = htmlentities($value);
+                }
+                $this->render_button();
                 ?>
-                <?php $this->render_text(); ?>
-                <textarea <?php echo $this->get_render_attribute_string('input'); ?>><?php echo $settings['e_clipboard_type'] == 'textarea' ? $settings['e_clipboard_textarea'] : $settings['e_clipboard_code']; ?></textarea>    
-            <?php } ?>
+                <textarea <?php echo $this->get_render_attribute_string('input'); ?>><?php echo $value; ?></textarea>    
+        <?php } ?>
         </div>
         <?php
     }
@@ -966,7 +987,7 @@ class Button extends Base_Widget {
      * @since 1.5.0
      * @access protected
      */
-    protected function render_text() {
+    protected function render_button() {
         $settings = $this->get_settings_for_display();
 
         $this->add_render_attribute([
@@ -988,11 +1009,11 @@ class Button extends Base_Widget {
         ?>
         <button <?php echo $this->get_render_attribute_string('button'); ?>>
             <span <?php echo $this->get_render_attribute_string('content-wrapper'); ?>>
-        <?php if (!empty($settings['icon']) || !empty($settings['selected_icon']['value'])) : ?>
+                    <?php if (!empty($settings['icon']) || !empty($settings['selected_icon']['value'])) : ?>
                     <span <?php echo $this->get_render_attribute_string('icon-align'); ?>>
                     <?php Icons_Manager::render_icon($settings['selected_icon'], ['aria-hidden' => 'true']); ?>
                     </span>
-                    <?php endif; ?>
+        <?php endif; ?>
                 <span <?php echo $this->get_render_attribute_string('text'); ?>><?php echo $settings['text']; ?></span>
             </span>
         </button>
