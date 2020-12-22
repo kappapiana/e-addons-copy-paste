@@ -19,6 +19,10 @@ What is more, you can store the Copied JSON for a later Paste and also share it 
 
 == Changelog ==
 
+= 1.1.1 =
+* Add: HtmlEntities option in Widget Button Copy
+* Fix: Copy/Paste Fallback mode on non secure site
+
 = 1.1 =
 * Add: Widget Button Copy
 

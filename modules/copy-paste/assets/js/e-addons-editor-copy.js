@@ -34,20 +34,14 @@ jQuery(window).on('load', function () {
 
 jQuery(window).on('load', function () {
 
-    // At this time, the new API is only available in Chrome 66+ and only copying/pasting of plain text is supported.
-    // Note that the API only works when served over secured domains (https) or localhost and when the page is the browser's currently active tab.
-    // https://googlechrome.github.io/samples/async-clipboard/
-    // https://developers.google.com/web/updates/2018/03/clipboardapi
-    //console.log(navigator.clipboard);
-
     // COPY
     jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function () {
         //console.log('e copy start');
         var transferData = elementorCommon.storage.get('clipboard');
         if (!transferData) {
-            transferData = elementorCommon.storage.get('transfer'); //elementorFrontend.config.elements.data[e_model_cid]; //.attributes;
+            transferData = elementorCommon.storage.get('transfer');
         }
-        //console.log(transferData.elements[0].settings);
+        //console.log(transferData);
         var jTransferData = JSON.stringify(transferData);
         if (navigator.clipboard) {
             navigator.clipboard.writeText(jTransferData)
@@ -61,11 +55,24 @@ jQuery(window).on('load', function () {
         } else {
             // fallback
             eAddCopyPasteFallback(jTransferData);
-            var clipboard = new ClipboardJS('#e_copy_paste_btn');
-            jQuery('#e_copy_paste_btn').trigger('click');
+            var clipboard = new ClipboardJS('#e_copy_paste__btn');
+
+            clipboard.on('success', function (e) {
+                console.info('Action:', e.action);
+                console.info('Text:', e.text);
+                console.info('Trigger:', e.trigger);
+                e.clearSelection();
+            });
+            clipboard.on('error', function (e) {
+                console.error('Action:', e.action);
+                console.error('Trigger:', e.trigger);
+            });
+
+            jQuery('#e_copy_paste__btn').trigger('click');
+
             jQuery('#e_copy_paste').remove();
             // Success!
-            //console.log('e copied fallback');
+            console.log('e copied fallback');
         }
     });
 
@@ -131,10 +138,10 @@ function ePasteFromClipboard(pasteAction, pasteBtn) {
                 });
     } else {
         jQuery(pasteBtn).closest('.elementor-context-menu').hide()
-        eAddCopyPasteFallback('', 'paste', cid, pasteAction, pasteBtn);
+        eAddCopyPasteFallback('', 'paste', cid, pasteAction, pasteBtn); // create an empty textarea
         jQuery('#e_copy_paste__textarea').select();
         document.execCommand("paste");
-        var text = jQuery('#e_copy_paste_textarea').val();
+        var text = jQuery('#e_copy_paste__textarea').val(); // retrieve the pasted text
         if (text) {
             jQuery('#e_copy_paste__btn').trigger('click');
         }
@@ -144,21 +151,21 @@ function ePasteFromClipboard(pasteAction, pasteBtn) {
 
 function eAddCopyPasteFallback(value = '', action = 'copy', cid, pasteAction, pasteBtn) {
     if (jQuery('#e_copy_paste').length) {
-        jQuery('#e_copy_paste').attr('data-model-cid', cid);
-        jQuery('#e_copy_paste__textarea').val('');
-    } else {
-        jQuery('#elementor-preview-responsive-wrapper').append('<div id="e_copy_paste" class="elementor-context-menu" data-model-cid="' + cid + '"></div>');
-        jQuery('#e_copy_paste').append('<p>Sorry, <b>DIRECT Paste is not supported by your browser</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
-        jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
-        jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> PASTE</button>');
-        jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
+        jQuery('#e_copy_paste').remove();
     }
-    jQuery('#e_copy_paste__textarea').select();
-    jQuery('#e_copy_paste__btn').off();
-    jQuery('#e_copy_paste__btn').on('click', function () {
-        var text = jQuery('#e_copy_paste__textarea').val();
-        ePasteAction(text, pasteAction, pasteBtn, jQuery('#e_copy_paste').attr('data-model-cid'));
-    });
+    jQuery('#elementor-preview-responsive-wrapper').append('<div id="e_copy_paste" class="elementor-context-menu" data-model-cid="' + cid + '"></div>');
+    jQuery('#e_copy_paste').append('<p>Sorry, <b>DIRECT Paste is not supported by your browser</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
+    jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
+    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> PASTE</button>');
+    jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
+    if (action == 'paste') {
+        jQuery('#e_copy_paste').attr('data-model-cid', cid);
+        jQuery('#e_copy_paste__btn').on('click', function () {
+            var text = jQuery('#e_copy_paste__textarea').val();
+            ePasteAction(text, pasteAction, pasteBtn, jQuery('#e_copy_paste').attr('data-model-cid'));
+            jQuery('#e_copy_paste').remove();
+        });
+    }
     jQuery('#e_copy_paste__close').on('click', function () {
         jQuery('#e_copy_paste').remove();
     });
