@@ -92,3 +92,20 @@
 	border-radius: 0 0 3px 3px;
 	width: 100%;
 }
+
+.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title .elementor-context-menu-element_id__icon {
+    float: right;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin-right: 4px;
+    padding: 2px 4px;
+    color: #c2cbd2;
+    line-height: 1;
+}
+.elementor-context-menu-list__item.elementor-context-menu-list__item-copy:hover .elementor-context-menu-list__item__title .elementor-context-menu-element_id__icon {
+    color: white;
+}
+.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title .elementor-context-menu-element_id__icon:hover {
+    background-color: white;
+    color: #71d7f7;
+}

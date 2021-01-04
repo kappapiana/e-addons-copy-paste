@@ -10,8 +10,6 @@ if (!defined('ABSPATH')) {
 
 class Clipboard_Copy_Paste extends Base_Extension {
     
-    public $common_sections_actions = array();
-    
     public function get_pid() {
         return 209;
     }

@@ -18,31 +18,73 @@
 })(jQuery);
 
 // add context menu item to add-section
-jQuery(window).on('load', function () {
-    setInterval(function () {
-        if (!jQuery('.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-e_paste').length) {
-            jQuery('.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-paste').after(
-                    '<div class="elementor-context-menu-list__item elementor-context-menu-list__item-e_paste"><div class="elementor-context-menu-list__item__icon"></div><div class="elementor-context-menu-list__item__title">Paste from Clipboard</div></div>'
-                    );
-        }
-    }, 1000);
-    jQuery(document).on('click', '.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-e_paste', function () {
-        //console.log('e paste start - add section');
-        ePasteFromClipboard(false, this);
+//jQuery(window).on('load', function () {
+jQuery(document).ready(function () {
+    elementor.on('preview:loaded', function () {
+        //console.log('preview:loaded');
+        eAddPasteAll();
     });
 });
+
+function eAddPasteAll() {
+    setTimeout(function () {
+        if (!jQuery("#elementor-loading:visible").length) {
+            //console.log('no loading');
+            var preview_iframe = jQuery("iframe#elementor-preview-iframe").contents();
+            //console.log(preview_iframe.find('#elementor-add-new-section').length);
+            //preview_iframe.one('contextmenu', '#elementor-add-new-section', function(){
+            preview_iframe.find('#elementor-add-new-section').one('contextmenu', function () {
+                //console.log('contextmenu');
+                if (!jQuery('.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-e_paste').length) {
+                    jQuery('.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-paste').after(
+                            '<div class="elementor-context-menu-list__item elementor-context-menu-list__item-e_paste"><div class="elementor-context-menu-list__item__icon"></div><div class="elementor-context-menu-list__item__title">Paste from Clipboard</div></div>'
+                            );
+                    //console.log('add paste all');
+                    jQuery(document).on('click', '.elementor-context-menu-list__group-paste .elementor-context-menu-list__item-e_paste', function () {
+                        //console.log('e paste start - add section');
+                        ePasteFromClipboard(false, this);
+                    });
+                }
+            });
+
+            // add Element ID copy
+            setInterval(function () {
+                jQuery('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title').each(function () {
+                    if (!jQuery(this).find('.elementor-context-menu-element_id__icon').length) {
+                        jQuery(this).append('<div class="elementor-context-menu-element_id__icon">#</div>');
+                        jQuery(this).find('.elementor-context-menu-element_id__icon').hide().fadeIn();
+                    }
+                });
+            }, 1000);
+
+        } else {
+            //console.log('loading');
+            eAddPasteAll();
+        }
+    }, 1000);
+}
 
 jQuery(window).on('load', function () {
 
     // COPY
-    jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function () {
+    jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function (e) {
+
+        //console.log(e);
+
         //console.log('e copy start');
         var transferData = elementorCommon.storage.get('clipboard');
         if (!transferData) {
             transferData = elementorCommon.storage.get('transfer');
         }
-        //console.log(transferData);
         var jTransferData = JSON.stringify(transferData);
+
+        if (jQuery(e.target).hasClass('elementor-context-menu-element_id__icon')) {
+            // copy Element ID
+            jTransferData = transferData[0]['id'];
+        }
+
+        //console.log(transferData);
+
         if (navigator.clipboard) {
             navigator.clipboard.writeText(jTransferData)
                     .then(() => {
