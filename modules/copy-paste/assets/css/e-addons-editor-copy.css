@@ -93,6 +93,12 @@
 	width: 100%;
 }
 
+#e_copy_paste__file_label {
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
 .elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title .elementor-context-menu-element_id__icon {
     float: right;
     border: 1px solid #ddd;

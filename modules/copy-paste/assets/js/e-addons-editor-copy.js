@@ -1,6 +1,6 @@
 /*
- * NERD COPY/PASTE from Clipboard
- * nerds.farm
+ * e-addons COPY/PASTE from Clipboard
+ * e-addons.com
  */
 
 (function ($) {
@@ -196,16 +196,23 @@ function eAddCopyPasteFallback(value = '', action = 'copy', cid, pasteAction, pa
         jQuery('#e_copy_paste').remove();
     }
     jQuery('#elementor-preview-responsive-wrapper').append('<div id="e_copy_paste" class="elementor-context-menu" data-model-cid="' + cid + '"></div>');
-    jQuery('#e_copy_paste').append('<p>Sorry, <b>DIRECT Paste is not supported by your browser</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
+    jQuery('#e_copy_paste').append('<p>Sorry, direct Paste is <b>not supported</b> by your browser or your <b>clipboard is empty</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
     jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
+    jQuery('#e_copy_paste').append('<label id="e_copy_paste__file_label" for="e_copy_paste__file">or choose an Elementor template JSON file:</label><input type="file" id="e_copy_paste__file">');
     jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> PASTE</button>');
     jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
     if (action == 'paste') {
+        jQuery('#e_copy_paste__textarea').trigger('click').focus();
         jQuery('#e_copy_paste').attr('data-model-cid', cid);
         jQuery('#e_copy_paste__btn').on('click', function () {
             var text = jQuery('#e_copy_paste__textarea').val();
             ePasteAction(text, pasteAction, pasteBtn, jQuery('#e_copy_paste').attr('data-model-cid'));
             jQuery('#e_copy_paste').remove();
+        });
+        jQuery('#e_copy_paste__file').on('change', function () {
+            const fileList = this.files;
+            console.log(fileList);
+            eReadTemplate(fileList[0]);
         });
     }
     jQuery('#e_copy_paste__close').on('click', function () {
@@ -225,6 +232,9 @@ function ePasteAction(text, pasteAction, pasteBtn, cid) {
     if (isJson) {
         var clipboardData = JSON.parse(text);
         //console.log(clipboardData);
+        if (clipboardData.content) {
+            clipboardData = clipboardData.content;
+        }
         clipboardData = eGenerateUniqueID(clipboardData);
         //if (transferData.elements.length) {
         elementorCommon.storage.set('clipboard', clipboardData); // >= 2.8
@@ -257,7 +267,8 @@ function ePasteAction(text, pasteAction, pasteBtn, cid) {
         //}
         jQuery('#e_copy_paste').remove();
     } else {
-        alert('Invalid JSON Element saved in Clipboard:\r\n------------------\r\n' + text);
+        alert('Invalid JSON Element in Clipboard:\r\n------------------\r\n' + text);
+        eAddCopyPasteFallback('', 'paste', cid, pasteAction, pasteBtn);
     }
 }
 
@@ -273,4 +284,23 @@ function eGenerateUniqueID(elements) {
 
 function eCanJsPaste() {
     return navigator.clipboard && typeof navigator.clipboard.readText === "function" && (location.protocol == 'https:' || location.hostname == 'localhost' || location.hostname == '127.0.0.1');
+}
+
+function eReadTemplate(file) {
+    // Check if the file is a json.
+    if (file.type && file.type.indexOf('json') === -1) {
+        console.log(file.type);
+        alert('Sorry, you not select a valid exported Elementor template JSON file.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+        //console.log(event);
+        let tmp = event.target.result.split(';base64,');
+        let base64 = tmp.pop();
+        let fileContent = atob(base64);
+        jQuery('#e_copy_paste__textarea').val(fileContent);
+    });
+    reader.readAsDataURL(file);
 }
