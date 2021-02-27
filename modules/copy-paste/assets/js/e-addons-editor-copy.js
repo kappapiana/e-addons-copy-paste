@@ -52,7 +52,9 @@ function eAddPasteAll() {
                 jQuery('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title').each(function () {
                     if (!jQuery(this).find('.elementor-context-menu-element_id__icon').length) {
                         jQuery(this).append('<div class="elementor-context-menu-element_id__icon">#</div>');
+                        jQuery(this).append('<div class="elementor-context-menu-element_download__icon"><i class="eicon-download-button"></i></div>');
                         jQuery(this).find('.elementor-context-menu-element_id__icon').hide().fadeIn();
+                        jQuery(this).find('.elementor-context-menu-element_download__icon').hide().fadeIn();
                     }
                 });
             }, 1000);
@@ -78,11 +80,29 @@ jQuery(window).on('load', function () {
         }
         var jTransferData = JSON.stringify(transferData);
 
+        //console.log(jQuery(e.target));
         if (jQuery(e.target).hasClass('elementor-context-menu-element_id__icon')) {
             // copy Element ID
             jTransferData = transferData[0]['id'];
+        }        
+        if (jQuery(e.target).hasClass('elementor-context-menu-element_download__icon') || jQuery(e.target).hasClass('eicon-download-button')) {
+            // download
+            let filename = transferData[0]['elType'];
+            if (filename == 'widget') {
+                filename += '_' + transferData[0]['widgetType'];
+            }
+            jTransferData = '{"version":"1.0.1","title":"'+filename+'","type":"page","content":'+jTransferData+'}';
+            filename += '_' + transferData[0]['id'] + '.json';
+            //alert(filename);
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jTransferData));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            return;
         }
-
         //console.log(transferData);
 
         if (navigator.clipboard) {
