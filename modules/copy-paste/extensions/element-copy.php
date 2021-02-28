@@ -436,6 +436,9 @@ class Element_Copy extends Base_Extension {
         if (!empty($settings['e_frontend_copy'])) {
             $this->_render($element);
             wp_enqueue_script('e-addons-element-copy');
+            //wp_enqueue_script('e-addons-element-copy');
+            $this->register_script('assets/lib/clipboard.js/clipboard.min.js');
+            wp_enqueue_script('clipboard.min');
             //$content = ob_get_clean();
             //echo $content;
         }

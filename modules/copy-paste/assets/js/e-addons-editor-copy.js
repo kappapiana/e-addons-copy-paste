@@ -242,7 +242,7 @@ function eAddPasteFallback(value = '', action = 'copy', cid, pasteAction, pasteB
     jQuery('#e_copy_paste').append('<p>Sorry, direct Paste is <b>not supported</b> by your browser or your <b>clipboard is empty</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
     jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
     jQuery('#e_copy_paste').append('<label id="e_copy_paste__file_label" for="e_copy_paste__file">or choose an Elementor Template JSON file:</label><input type="file" id="e_copy_paste__file">');
-    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> '+pasteAction.title+'</button>');
+    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> '+(pasteAction ? pasteAction.title : 'Paste')+'</button>');
     jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
     if (action == 'paste') {
         jQuery('#e_copy_paste__textarea').trigger('click').focus();
