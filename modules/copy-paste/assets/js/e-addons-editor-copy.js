@@ -49,12 +49,16 @@ function eAddPasteAll() {
 
             // add Element ID copy
             setInterval(function () {
-                jQuery('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title').each(function () {
-                    if (!jQuery(this).find('.elementor-context-menu-element_id__icon').length) {
-                        jQuery(this).append('<div class="elementor-context-menu-element_id__icon">#</div>');
-                        jQuery(this).append('<div class="elementor-context-menu-element_download__icon"><i class="eicon-download-button"></i></div>');
-                        jQuery(this).find('.elementor-context-menu-element_id__icon').hide().fadeIn();
-                        jQuery(this).find('.elementor-context-menu-element_download__icon').hide().fadeIn();
+                jQuery('.elementor-context-menu').each(function () {
+                    if (!jQuery(this).find('.elementor-context-menu-element__icon').length) {
+                        let copy = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title');
+                        copy.append('<abbr title="Copy Element ID to Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_id__icon e-copy-id">#</abbr>');
+                        copy.append('<abbr title="Download Element to Json" class="elementor-context-menu-element__icon elementor-context-menu-element_download__icon e-download"><i class="e-download eicon-download-button"></i></abbr>');
+                        let paste = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-paste .elementor-context-menu-list__item__title');
+                        paste.append('<abbr title="Paste from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste__icon e-paste"><i class="e-paste eicon-code"></i></abbr>');
+                        let paste_style = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-pasteStyle .elementor-context-menu-list__item__title');
+                        paste_style.append('<abbr title="Paste Style from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste_style__icon e-paste-style"><i class="e-paste-style eicon-code"></i></abbr>');
+                        jQuery(this).find('.elementor-context-menu-element__icon').hide().fadeIn();
                     }
                 });
             }, 1000);
@@ -67,7 +71,27 @@ function eAddPasteAll() {
 }
 
 jQuery(window).on('load', function () {
-
+    
+    
+    jQuery(document).on('mousedown', '.elementor-context-menu-list__item-paste', function (e) {
+        console.log(jQuery(e.target));
+        if (jQuery(e.target).hasClass('e-paste')) {
+            elementorCommon.storage.set('clipboard', ''); // prevent default Past action
+            //elementorCommon.storage.set('transfer', '');
+            jQuery(this).siblings(".elementor-context-menu-list__item-e_paste").trigger('click');
+            return false;
+        }
+    });
+    jQuery(document).on('mousedown', '.elementor-context-menu-list__item-pasteStyle', function (e) {
+        console.log(jQuery(e.target));
+        if (jQuery(e.target).hasClass('e-paste-style')) {
+            elementorCommon.storage.set('clipboard', ''); // prevent default Past action
+            //elementorCommon.storage.set('transfer', '');
+            jQuery(this).siblings(".elementor-context-menu-list__item-e_paste_style").trigger('click');
+            return false;
+        }
+    });
+    
     // COPY
     jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function (e) {
 
@@ -81,11 +105,11 @@ jQuery(window).on('load', function () {
         var jTransferData = JSON.stringify(transferData);
 
         //console.log(jQuery(e.target));
-        if (jQuery(e.target).hasClass('elementor-context-menu-element_id__icon')) {
+        if (jQuery(e.target).hasClass('e-copy-id')) {
             // copy Element ID
             jTransferData = transferData[0]['id'];
         }        
-        if (jQuery(e.target).hasClass('elementor-context-menu-element_download__icon') || jQuery(e.target).hasClass('eicon-download-button')) {
+        if (jQuery(e.target).hasClass('e-download')) {
             // download
             let filename = transferData[0]['elType'];
             if (filename == 'widget') {

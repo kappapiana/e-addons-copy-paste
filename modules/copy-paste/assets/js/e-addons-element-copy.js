@@ -3,7 +3,7 @@
 
         jQuery('.elementor-button-copy-wrapper').each(function () {
             let prev = jQuery(this).prev();
-            console.log(prev.data('element_type'));
+            //console.log(prev.data('element_type'));
             switch (prev.data('element_type')) {
                 case 'widget':
                     jQuery(this).appendTo(prev.children('.elementor-widget-container'));
@@ -17,10 +17,10 @@
                     prev.children('.elementor-container').css('flex-wrap', 'wrap');
                     break;
             }            
-            //jQuery(this).fadeIn();
+            jQuery(this).removeClass('elementor-hidden').addClass('e-block');
             
             let btn = jQuery(this).find('.elementor-download-button');
-            console.log(btn);
+            //console.log(btn);
             if (btn.length) {
                 let element = jQuery(this).closest('.elementor-element');
                 let settings = jQuery(btn.data('clipboard-target')).val();

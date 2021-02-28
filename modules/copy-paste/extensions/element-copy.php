@@ -72,7 +72,7 @@ class Element_Copy extends Base_Extension {
             'type' => Controls_Manager::SWITCHER,
             'selectors' => [
                 '{{WRAPPER}} .e-offscreen' => 'position: absolute; left: -999em; display: block !important;',
-                '{{WRAPPER}} .e-block' => 'display: block !important;',
+                '{{WRAPPER}} .e-block' => 'display: block !important; width: 100%;',
                 '{{WRAPPER}} .e-frontend-copy .elementor-button' => 'cursor: pointer;',
             ]
                 ]
@@ -454,7 +454,7 @@ class Element_Copy extends Base_Extension {
         $element->add_render_attribute('wrapper', 'class', 'elementor-button-copy-wrapper');
         $element->add_render_attribute('wrapper', 'class', 'elementor-button-wrapper');
         $element->add_render_attribute('wrapper', 'class', 'e-frontend-copy');
-        $element->add_render_attribute('wrapper', 'class', 'e-block');
+        $element->add_render_attribute('wrapper', 'class', 'elementor-hidden');
         if (!empty($settings['e_frontend_copy_align'])) {
             $element->add_render_attribute('wrapper', 'class', 'elementor-align-' . $settings['e_frontend_copy_align']);
         }
