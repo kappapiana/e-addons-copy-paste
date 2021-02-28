@@ -74,7 +74,6 @@ jQuery(window).on('load', function () {
     
     
     jQuery(document).on('mousedown', '.elementor-context-menu-list__item-paste', function (e) {
-        console.log(jQuery(e.target));
         if (jQuery(e.target).hasClass('e-paste')) {
             elementorCommon.storage.set('clipboard', ''); // prevent default Past action
             //elementorCommon.storage.set('transfer', '');
@@ -83,7 +82,6 @@ jQuery(window).on('load', function () {
         }
     });
     jQuery(document).on('mousedown', '.elementor-context-menu-list__item-pasteStyle', function (e) {
-        console.log(jQuery(e.target));
         if (jQuery(e.target).hasClass('e-paste-style')) {
             elementorCommon.storage.set('clipboard', ''); // prevent default Past action
             //elementorCommon.storage.set('transfer', '');
@@ -94,8 +92,6 @@ jQuery(window).on('load', function () {
     
     // COPY
     jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function (e) {
-
-        //console.log(e);
 
         //console.log('e copy start');
         var transferData = elementorCommon.storage.get('clipboard');
@@ -140,7 +136,7 @@ jQuery(window).on('load', function () {
                     });
         } else {
             // fallback
-            eAddCopyPasteFallback(jTransferData);
+            eAddPasteFallback(jTransferData);
             var clipboard = new ClipboardJS('#e_copy_paste__btn');
 
             clipboard.on('success', function (e) {
@@ -158,7 +154,7 @@ jQuery(window).on('load', function () {
 
             jQuery('#e_copy_paste').remove();
             // Success!
-            console.log('e copied fallback');
+            //console.log('e copied fallback');
         }
     });
 
@@ -190,7 +186,6 @@ function eAddPasteAction(groups, element) {
                         name: 'e_paste_style',
                         title: 'Paste Style from Clipboard',
                         callback: function () {
-                            // do your stuff, element should be available here
                             //console.log('Paste Style from Clipboard');
                             pasteStyleAction = _.findWhere(transferGroup.actions, {name: 'pasteStyle'});
                             return ePasteFromClipboard(pasteStyleAction);
@@ -205,8 +200,11 @@ function eAddPasteAction(groups, element) {
 
 // PASTE
 function ePasteFromClipboard(pasteAction, pasteBtn) {
-
-    var cid = jQuery(pasteBtn).closest('.elementor-context-menu').attr('data-model-cid');
+    
+    let cid = false;
+    if (pasteBtn) {
+        cid = jQuery(pasteBtn).closest('.elementor-context-menu').attr('data-model-cid');        
+    }
     if (!cid || cid == 'undefined') {
         cid = jQuery('.elementor-context-menu:visible').attr('data-model-cid');
     }
@@ -224,7 +222,7 @@ function ePasteFromClipboard(pasteAction, pasteBtn) {
                 });
     } else {
         jQuery(pasteBtn).closest('.elementor-context-menu').hide()
-        eAddCopyPasteFallback('', 'paste', cid, pasteAction, pasteBtn); // create an empty textarea
+        eAddPasteFallback('', 'paste', cid, pasteAction, pasteBtn); // create an empty textarea
         jQuery('#e_copy_paste__textarea').select();
         document.execCommand("paste");
         var text = jQuery('#e_copy_paste__textarea').val(); // retrieve the pasted text
@@ -235,15 +233,16 @@ function ePasteFromClipboard(pasteAction, pasteBtn) {
     return true;
 }
 
-function eAddCopyPasteFallback(value = '', action = 'copy', cid, pasteAction, pasteBtn) {
+function eAddPasteFallback(value = '', action = 'copy', cid, pasteAction, pasteBtn) {
+    //console.log(pasteAction);
     if (jQuery('#e_copy_paste').length) {
         jQuery('#e_copy_paste').remove();
     }
     jQuery('#elementor-preview-responsive-wrapper').append('<div id="e_copy_paste" class="elementor-context-menu" data-model-cid="' + cid + '"></div>');
     jQuery('#e_copy_paste').append('<p>Sorry, direct Paste is <b>not supported</b> by your browser or your <b>clipboard is empty</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
     jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
-    jQuery('#e_copy_paste').append('<label id="e_copy_paste__file_label" for="e_copy_paste__file">or choose an Elementor template JSON file:</label><input type="file" id="e_copy_paste__file">');
-    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> PASTE</button>');
+    jQuery('#e_copy_paste').append('<label id="e_copy_paste__file_label" for="e_copy_paste__file">or choose an Elementor Template JSON file:</label><input type="file" id="e_copy_paste__file">');
+    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> '+pasteAction.title+'</button>');
     jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
     if (action == 'paste') {
         jQuery('#e_copy_paste__textarea').trigger('click').focus();
@@ -255,7 +254,7 @@ function eAddCopyPasteFallback(value = '', action = 'copy', cid, pasteAction, pa
         });
         jQuery('#e_copy_paste__file').on('change', function () {
             const fileList = this.files;
-            console.log(fileList);
+            //console.log(fileList);
             eReadTemplate(fileList[0]);
         });
     }
@@ -312,7 +311,7 @@ function ePasteAction(text, pasteAction, pasteBtn, cid) {
         jQuery('#e_copy_paste').remove();
     } else {
         alert('Invalid JSON Element in Clipboard:\r\n------------------\r\n' + text);
-        eAddCopyPasteFallback('', 'paste', cid, pasteAction, pasteBtn);
+        eAddPasteFallback('', 'paste', cid, pasteAction, pasteBtn);
     }
 }
 
@@ -333,8 +332,8 @@ function eCanJsPaste() {
 function eReadTemplate(file) {
     // Check if the file is a json.
     if (file.type && file.type.indexOf('json') === -1) {
-        console.log(file.type);
-        alert('Sorry, you not select a valid exported Elementor template JSON file.');
+        //console.log(file.type);
+        alert('Sorry, you not select a valid exported Elementor Template JSON file.');
         return;
     }
 
