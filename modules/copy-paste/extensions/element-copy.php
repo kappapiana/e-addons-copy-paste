@@ -31,15 +31,25 @@ class Element_Copy extends Base_Extension {
         return 'copy';
     }
 
-    /*
-      public function get_pid() {
-      return 1039;
-      }
-
-      public function get_icon() {
-      return 'eadd-rowcolumn-link';
-      }
+    /**
+     * Get Label
+     *
+     * Returns the action label
+     *
+     * @access public
+     * @return string
      */
+    public function get_label() {
+        return __('Frontend Download/Copy', 'e-addons');
+    }
+
+    public function get_pid() {
+        return 14919;
+    }
+
+    public function get_icon() {
+        return 'eadd-element-copy-download';
+    }
 
     /**
      * Add Actions
@@ -55,6 +65,8 @@ class Element_Copy extends Base_Extension {
 
         //add_action('elementor/frontend/before_render', [$this, '_before_render']);
         add_action('elementor/frontend/after_render', [$this, '_after_render']);
+        add_action('elementor/widget/render_content', array($this, '_render_content'), 11, 2);
+        //add_filter('elementor/widget/print_template', array($this, '_print_template'), 11, 2);
     }
 
     /**
@@ -68,7 +80,7 @@ class Element_Copy extends Base_Extension {
 
         $element->add_control(
                 'e_frontend_copy', [
-            'label' => __('Enable Frontend Copy Button', 'elementor'),
+            'label' => __('Enable Frontend Buttons', 'elementor'),
             'type' => Controls_Manager::SWITCHER,
             'selectors' => [
                 '{{WRAPPER}} .e-offscreen' => 'position: absolute; left: -999em; display: block !important;',
@@ -77,6 +89,17 @@ class Element_Copy extends Base_Extension {
             ]
                 ]
         );
+
+        $element->add_control(
+                'e_frontend_visitors', [
+            'label' => __('Enable for Visitors', 'elementor'),
+            'type' => Controls_Manager::SWITCHER,
+            'condition' => [
+                'e_frontend_copy!' => '',
+            ]
+                ]
+        );
+
         $element->add_control(
                 'e_frontend_copy_action',
                 [
@@ -205,6 +228,42 @@ class Element_Copy extends Base_Extension {
                     ],
                     //'prefix_class' => 'elementor%s-align-',
                     'default' => '',
+                ]
+        );
+
+        $element->add_responsive_control(
+                'e_frontend_copy_valign',
+                [
+                    'label' => __('Vertical Align', 'elementor'),
+                    'type' => Controls_Manager::CHOOSE,
+                    'options' => [
+                        '0' => [
+                            'title' => __('Top', 'elementor'),
+                            'icon' => 'eicon-v-align-top',
+                        ],
+                        '50' => [
+                            'title' => __('Middle', 'elementor'),
+                            'icon' => 'eicon-v-align-middle',
+                        ],
+                        '100' => [
+                            'title' => __('Bottom', 'elementor'),
+                            'icon' => 'eicon-v-align-bottom',
+                        ],
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} .e-frontend-copy' => 'position: absolute; left: 0; width: 100%; top: {{VALUE}}%;',
+                    ],
+                ]
+        );
+
+        $element->add_control(
+                'e_frontend_copy_hover', [
+            'label' => __('Visible on Hover', 'elementor'),
+            'type' => Controls_Manager::SWITCHER,
+            'selectors' => [
+                '{{WRAPPER}}:hover .e-frontend-copy' => 'opacity: 1;',
+                '{{WRAPPER}} .e-frontend-copy' => 'opacity: 0; transition: 0.5s all;',
+            ]
                 ]
         );
 
@@ -409,6 +468,18 @@ class Element_Copy extends Base_Extension {
         );
 
         $element->add_responsive_control(
+                'e_frontend_copy_text_margin',
+                [
+                    'label' => __('Margin', 'elementor'),
+                    'type' => Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%'],
+                    'selectors' => [
+                        '{{WRAPPER}} .e-frontend-copy .elementor-button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                    'separator' => 'before',
+                ]
+        );
+        $element->add_responsive_control(
                 'e_frontend_copy_text_padding',
                 [
                     'label' => __('Padding', 'elementor'),
@@ -417,9 +488,9 @@ class Element_Copy extends Base_Extension {
                     'selectors' => [
                         '{{WRAPPER}} .e-frontend-copy .elementor-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                     ],
-                    'separator' => 'before',
                 ]
         );
+
 
         $element->end_controls_section();
     }
@@ -427,21 +498,57 @@ class Element_Copy extends Base_Extension {
     public function _before_render($element) {
         $settings = $element->get_settings();
         if (!empty($settings['e_frontend_copy'])) {
-            ob_start();
+            //ob_start();
         }
     }
 
-    public function _after_render($element) {
+    public function _after_render($element, $widget = false) {
+        if ($element->get_type() != 'widget' || $widget) {
+            $settings = $element->get_settings();
+            if (!empty($settings['e_frontend_copy'])) {
+                if (empty($settings['e_frontend_visitors'])) {
+                    if (!get_current_user_id()) {
+                        return;
+                    }
+                }
+                //$content = ob_get_clean();
+                //ob_start();
+                $this->_render($element);
+                //$btn = ob_get_clean();
+                //echo $content;
+                wp_enqueue_script('e-addons-element-copy');
+                //wp_enqueue_script('e-addons-element-copy');
+                $this->register_script('assets/lib/clipboard.js/clipboard.min.js');
+                wp_enqueue_script('clipboard.min');
+                //$content = ob_get_clean();
+                //echo $content;
+            }
+        }
+    }
+
+    public function _render_content($content, $element) {
         $settings = $element->get_settings();
         if (!empty($settings['e_frontend_copy'])) {
-            $this->_render($element);
-            wp_enqueue_script('e-addons-element-copy');
-            //wp_enqueue_script('e-addons-element-copy');
-            $this->register_script('assets/lib/clipboard.js/clipboard.min.js');
-            wp_enqueue_script('clipboard.min');
-            //$content = ob_get_clean();
-            //echo $content;
+            ob_start();
+            $this->_after_render($element, true);
+            $btn = ob_get_clean();
+            $tmp = explode('</div>', $content);
+            $temp = array_pop($tmp); //array_pop($tmp);//array_pop($tmp);
+            $tmp[] = $temp . $btn; //$tmp[] = $temp; //$tmp[] = ''; //$tmp[] = '';
+            $content = implode('</div>', $tmp);
         }
+        return $content;
+    }
+
+    public function _print_template($content, $element) {
+        $settings = $element->get_settings();
+        if (!empty($settings['e_frontend_copy'])) {
+            $content .= '<div class="elementor-button-copy-wrapper elementor-button-wrapper e-frontend-copy elementor-align-center e-block">
+<a class="elementor-copy-button elementor-button elementor-size-xs" href="#"><span class="elementor-button-content-wrapper"><span class="elementor-button-icon elementor-align-icon-left"><i aria-hidden="true" class="fas fa-copy"></i></span><span class="elementor-button-text">Copy</span></span></a>
+<a class="elementor-download-button elementor-button elementor-size-xs" href="#"><span class="elementor-button-content-wrapper elementor-button-content-wrapper"><span class="elementor-button-icon elementor-align-icon-left elementor-button-icon elementor-align-icon-left"><i aria-hidden="true" class="fas fa-download"></i></span><span class="elementor-button-text elementor-button-text">Download</span></span></a>
+</div>';
+        }
+        return $content; //$this->_render_content($content, $element);
     }
 
     /**
@@ -514,7 +621,7 @@ class Element_Copy extends Base_Extension {
         if (!empty($settings['e_frontend_copy_size'])) {
             $element->add_render_attribute('button_' . $settings['e_frontend_copy_action'], 'class', 'elementor-size-' . $settings['e_frontend_copy_size']);
         }
-        if ($settings['e_frontend_copy_hover_animation']) {
+        if (!empty($settings['e_frontend_copy_hover_animation'])) {
             $element->add_render_attribute('button_' . $settings['e_frontend_copy_action'], 'class', 'elementor-animation-' . $settings['e_frontend_copy_hover_animation']);
         }
 
@@ -525,7 +632,7 @@ class Element_Copy extends Base_Extension {
             'icon-align' => [
                 'class' => [
                     'elementor-button-icon',
-                    'elementor-align-icon-' . $settings['e_frontend_copy_icon_align'],
+                    'elementor-align-icon-' . (!empty($settings['e_frontend_copy_icon_align']) ? $settings['e_frontend_copy_icon_align'] : 'left'),
                 ],
             ],
             'text' => [

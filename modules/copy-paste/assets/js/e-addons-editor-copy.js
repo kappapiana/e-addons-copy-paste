@@ -52,8 +52,8 @@ function eAddPasteAll() {
                 jQuery('.elementor-context-menu').each(function () {
                     if (!jQuery(this).find('.elementor-context-menu-element__icon').length) {
                         let copy = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title');
-                        copy.append('<abbr title="Copy Element ID to Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_id__icon e-copy-id">#</abbr>');
-                        copy.append('<abbr title="Download Element to Json" class="elementor-context-menu-element__icon elementor-context-menu-element_download__icon e-download"><i class="e-download eicon-download-button"></i></abbr>');
+                        copy.append('<abbr title="Copy Element ID to Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_id__icon e-copy-id"><i class="e-copy-id eicon-cogs-check"></i></abbr>');
+                        copy.append('<abbr title="Download Element as Json Template" class="elementor-context-menu-element__icon elementor-context-menu-element_download__icon e-download"><i class="e-download eicon-file-download"></i></abbr>');
                         let paste = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-paste .elementor-context-menu-list__item__title');
                         paste.append('<abbr title="Paste from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste__icon e-paste"><i class="e-paste eicon-code"></i></abbr>');
                         let paste_style = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-pasteStyle .elementor-context-menu-list__item__title');
@@ -71,8 +71,7 @@ function eAddPasteAll() {
 }
 
 jQuery(window).on('load', function () {
-    
-    
+    // PASTE
     jQuery(document).on('mousedown', '.elementor-context-menu-list__item-paste', function (e) {
         if (jQuery(e.target).hasClass('e-paste')) {
             elementorCommon.storage.set('clipboard', ''); // prevent default Past action
@@ -81,6 +80,7 @@ jQuery(window).on('load', function () {
             return false;
         }
     });
+    // PASTE STYLE
     jQuery(document).on('mousedown', '.elementor-context-menu-list__item-pasteStyle', function (e) {
         if (jQuery(e.target).hasClass('e-paste-style')) {
             elementorCommon.storage.set('clipboard', ''); // prevent default Past action
@@ -89,7 +89,6 @@ jQuery(window).on('load', function () {
             return false;
         }
     });
-    
     // COPY
     jQuery(document).on('click', '.elementor-context-menu-list__item-copy, .elementor-context-menu-list__item-copy_all_content', function (e) {
 
@@ -104,14 +103,14 @@ jQuery(window).on('load', function () {
         if (jQuery(e.target).hasClass('e-copy-id')) {
             // copy Element ID
             jTransferData = transferData[0]['id'];
-        }        
+        }
         if (jQuery(e.target).hasClass('e-download')) {
             // download
             let filename = transferData[0]['elType'];
             if (filename == 'widget') {
                 filename += '_' + transferData[0]['widgetType'];
             }
-            jTransferData = '{"version":"1.0.1","title":"'+filename+'","type":"page","content":'+jTransferData+'}';
+            jTransferData = '{"version":"1.0.1","title":"' + filename + '","type":"page","content":' + jTransferData + '}';
             filename += '_' + transferData[0]['id'] + '.json';
             //alert(filename);
             var element = document.createElement('a');
@@ -200,10 +199,10 @@ function eAddPasteAction(groups, element) {
 
 // PASTE
 function ePasteFromClipboard(pasteAction, pasteBtn) {
-    
+
     let cid = false;
     if (pasteBtn) {
-        cid = jQuery(pasteBtn).closest('.elementor-context-menu').attr('data-model-cid');        
+        cid = jQuery(pasteBtn).closest('.elementor-context-menu').attr('data-model-cid');
     }
     if (!cid || cid == 'undefined') {
         cid = jQuery('.elementor-context-menu:visible').attr('data-model-cid');
@@ -242,7 +241,7 @@ function eAddPasteFallback(value = '', action = 'copy', cid, pasteAction, pasteB
     jQuery('#e_copy_paste').append('<p>Sorry, direct Paste is <b>not supported</b> by your browser or your <b>clipboard is empty</b>, to continue <b>MANUALLY Paste</b> content in the below Textarea and <b>click PASTE</b></p>');
     jQuery('#e_copy_paste').append('<textarea id="e_copy_paste__textarea" placeholder="Paste HERE">' + value + '</textarea>');
     jQuery('#e_copy_paste').append('<label id="e_copy_paste__file_label" for="e_copy_paste__file">or choose an Elementor Template JSON file:</label><input type="file" id="e_copy_paste__file">');
-    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> '+(pasteAction ? pasteAction.title : 'Paste')+'</button>');
+    jQuery('#e_copy_paste').append('<button id="e_copy_paste__btn" data-clipboard-action="' + action + '" data-clipboard-target="#e_copy_paste__textarea"><span class="icon pull-right ml-1"></span> ' + (pasteAction ? pasteAction.title : 'Paste') + '</button>');
     jQuery('#e_copy_paste').append('<a id="e_copy_paste__close" href="#"><i class="eicon-close"></i></a>');
     if (action == 'paste') {
         jQuery('#e_copy_paste__textarea').trigger('click').focus();

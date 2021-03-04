@@ -2,17 +2,22 @@
     jQuery(window).on('elementor/frontend/init', function () {
 
         jQuery('.elementor-button-copy-wrapper').each(function () {
-            let prev = jQuery(this).prev();
+            let prev = jQuery(this).prev(); //closest('.elementor-element'); //;
             //console.log(prev.data('element_type'));
             switch (prev.data('element_type')) {
                 case 'widget':
-                    jQuery(this).appendTo(prev.children('.elementor-widget-container'));
+                    //jQuery(this).appendTo(prev.children('.elementor-widget-container'));
                     break;
                 case 'column':
                     jQuery(this).appendTo(prev.children('.elementor-widget-wrap'));
                     break;
                 case 'section':
-                    jQuery(this).appendTo(prev.children('.elementor-container'));
+                    let row = prev.children('.elementor-container').children('.elementor-row');
+                    if (row.length) {
+                        jQuery(this).appendTo(row);
+                    } else {
+                        jQuery(this).appendTo(prev.children('.elementor-container'));
+                    }
                     jQuery(this).addClass('elementor-column').addClass('elementor-col-100');
                     prev.children('.elementor-container').css('flex-wrap', 'wrap');
                     break;
@@ -24,7 +29,6 @@
             if (btn.length) {
                 let element = jQuery(this).closest('.elementor-element');
                 let settings = jQuery(btn.data('clipboard-target')).val();
-                
                 
                 let filename = element.data('element_type');
                 if (filename == 'widget') {
