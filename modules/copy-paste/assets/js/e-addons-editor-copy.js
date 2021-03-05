@@ -52,12 +52,12 @@ function eAddPasteAll() {
                 jQuery('.elementor-context-menu').each(function () {
                     if (!jQuery(this).find('.elementor-context-menu-element__icon').length) {
                         let copy = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-copy .elementor-context-menu-list__item__title');
-                        copy.append('<abbr title="Copy Element ID to Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_id__icon e-copy-id"><i class="e-copy-id eicon-cogs-check"></i></abbr>');
-                        copy.append('<abbr title="Download Element as Json Template" class="elementor-context-menu-element__icon elementor-context-menu-element_download__icon e-download"><i class="e-download eicon-file-download"></i></abbr>');
+                        copy.append('<abbr title="Copy Element ID to Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_id__icon e-copy-id"><i class="e-copy-id eadd-copy-id"></i></abbr>');
+                        copy.append('<abbr title="Download Element as Json Template" class="elementor-context-menu-element__icon elementor-context-menu-element_download__icon e-download"><i class="e-download eadd-download"></i></abbr>');
                         let paste = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-paste .elementor-context-menu-list__item__title');
-                        paste.append('<abbr title="Paste from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste__icon e-paste"><i class="e-paste eicon-code"></i></abbr>');
+                        paste.append('<abbr title="Paste from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste__icon e-paste"><i class="e-paste eadd-paste-clipboard"></i></abbr>');
                         let paste_style = jQuery(this).find('.elementor-context-menu-list__item.elementor-context-menu-list__item-pasteStyle .elementor-context-menu-list__item__title');
-                        paste_style.append('<abbr title="Paste Style from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste_style__icon e-paste-style"><i class="e-paste-style eicon-code"></i></abbr>');
+                        paste_style.append('<abbr title="Paste Style from Clipboard" class="elementor-context-menu-element__icon elementor-context-menu-element_paste_style__icon e-paste-style"><i class="e-paste-style eadd-paste-style"></i></abbr>');
                         jQuery(this).find('.elementor-context-menu-element__icon').hide().fadeIn();
                     }
                 });
