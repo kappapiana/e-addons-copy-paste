@@ -4,7 +4,7 @@ Donate link: https://e-addons.com/donate/
 Tags: elementor, addons, e-addons, dynamic, template, copy, paste, module, clipboard
 Requires at least: 5.0
 Tested up to: 5.5.1
-Stable tag: 1.3
+Stable tag: 1.4
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -18,6 +18,11 @@ Clipboard Cross-Domain Copy-Paste allows you to copy any element from Sections t
 What is more, you can store the Copied JSON for a later Paste and also share it with your friends!
 
 == Changelog ==
+
+= 1.4 =
+* Add: Element Frontend Download/Copy Settings
+* Add: Editor Context menu Download Settings
+* Tweak: Copy/Download/Paste Actions as Icons to avoid the menu being too high
 
 = 1.3 =
 * Add: Support to exported json Elementor Template file
