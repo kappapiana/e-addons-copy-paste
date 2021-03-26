@@ -97,6 +97,7 @@ jQuery(window).on('load', function () {
         if (!transferData) {
             transferData = elementorCommon.storage.get('transfer');
         }
+        transferData = eRemoveHtmlCache(transferData);
         var jTransferData = JSON.stringify(transferData);
 
         //console.log(jQuery(e.target));
@@ -104,6 +105,7 @@ jQuery(window).on('load', function () {
             // copy Element ID
             jTransferData = transferData[0]['id'];
         }
+        
         if (jQuery(e.target).hasClass('e-download')) {
             // download
             let filename = transferData[0]['elType'];
@@ -312,6 +314,16 @@ function ePasteAction(text, pasteAction, pasteBtn, cid) {
         alert('Invalid JSON Element in Clipboard:\r\n------------------\r\n' + text);
         eAddPasteFallback('', 'paste', cid, pasteAction, pasteBtn);
     }
+}
+
+function eRemoveHtmlCache(elements) {
+    elements.forEach(function (item, index) {
+        elements[index].htmlCache = null;
+        if (item.elements.length > 0) {
+            elements[index].elements = eRemoveHtmlCache(item.elements);
+        }
+    });
+    return elements;
 }
 
 function eGenerateUniqueID(elements) {
