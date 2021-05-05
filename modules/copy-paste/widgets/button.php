@@ -223,6 +223,20 @@ class Button extends Base_Widget {
                 ]
         );
 
+        $animations = \Elementor\Control_Animation::get_animations();
+        if (!empty($animations['Attention Seekers'])) {
+            $animations = array('' => __('None', 'elementor')) + $animations['Attention Seekers'];
+        }
+        $this->add_control(
+                'click_animation',
+                [
+                    'label' => __('Click Animation', 'elementor'),
+                    'type' => Controls_Manager::SELECT,
+                    'options' => $animations,
+                    'default' => 'jello',
+                ]
+        );
+
         $this->add_control(
                 'button_css_id',
                 [
@@ -399,8 +413,6 @@ class Button extends Base_Widget {
 
         $this->end_controls_section();
 
-
-
         $this->start_controls_section(
                 'section_content',
                 [
@@ -412,24 +424,13 @@ class Button extends Base_Widget {
                 'e_clipboard_type',
                 [
                     'label' => __('Type', 'e-addons'),
-                    'type' => Controls_Manager::CHOOSE,
+                    'type' => Controls_Manager::SELECT,
                     'options' => [
-                        'text' => [
-                            'title' => __('Text', 'e-addons'),
-                            'icon' => 'fa fa-window-minimize',
-                        ],
-                        'textarea' => [
-                            'title' => __('Textarea', 'e-addons'),
-                            'icon' => 'fa fa-bars',
-                        ],
-                        'code' => [
-                            'title' => __('Code', 'e-addons'),
-                            'icon' => 'fa fa-code',
-                        ],
+                        'text' => __('Text', 'e-addons'),
+                        'textarea' => __('Textarea', 'e-addons'),
+                        'code' => __('Code', 'e-addons'),
                     ],
-                    //'label_block' => true,
                     'default' => 'text',
-                    'toggle' => false,
                 ]
         );
 
@@ -476,7 +477,6 @@ class Button extends Base_Widget {
             'type' => Controls_Manager::SWITCHER,
                 ]
         );
-
 
         // title
         $this->add_control(
@@ -556,8 +556,6 @@ class Button extends Base_Widget {
         );
 
         $this->end_controls_section();
-
-
 
         $this->start_controls_section(
                 'section_style_value',
@@ -934,27 +932,27 @@ class Button extends Base_Widget {
         }
         ?>
         <div <?php echo $this->get_render_attribute_string('wrapper'); ?>>
-            <?php
-            if ($settings['e_clipboard_type'] == 'text') {
+        <?php
+        if ($settings['e_clipboard_type'] == 'text') {
 
-                $value = $settings['e_clipboard_text'];
-                if (!empty($settings['e_clipboard_entities'])) {
-                    $value = htmlentities($value);
-                }
+            $value = $settings['e_clipboard_text'];
+            if (!empty($settings['e_clipboard_entities'])) {
+                $value = htmlentities($value);
+            }
 
-                $this->add_render_attribute('input', 'type', 'text');
-                $this->add_render_attribute('input', 'value', $value);
-                $this->add_render_attribute('input', 'class', 'e-form-control');
-                ?>
+            $this->add_render_attribute('input', 'type', 'text');
+            $this->add_render_attribute('input', 'value', $value);
+            $this->add_render_attribute('input', 'class', 'e-form-control');
+            ?>
                 <?php if ($settings['align'] != 'right') { ?>
                     <div <?php echo $this->get_render_attribute_string('wrapper-btn'); ?>>       
-                        <?php $this->render_button(); ?>              
+                    <?php $this->render_button(); ?>              
                     </div>
                 <?php } ?>
                 <input <?php echo $this->get_render_attribute_string('input'); ?>>            
-                <?php if ($settings['align'] == 'right') { ?>
+                    <?php if ($settings['align'] == 'right') { ?>
                     <div <?php echo $this->get_render_attribute_string('wrapper-btn'); ?>>       
-                        <?php $this->render_button(); ?>              
+                    <?php $this->render_button(); ?>              
                     </div>
                     <?php
                 }
@@ -974,54 +972,59 @@ class Button extends Base_Widget {
                 $this->render_button();
                 ?>
                 <textarea <?php echo $this->get_render_attribute_string('input'); ?>><?php echo $value; ?></textarea>    
-        <?php } ?>
+            <?php } ?>
         </div>
-        <?php
-    }
+            <?php
+        }
 
-    /**
-     * Render button text.
-     *
-     * Render button widget text.
-     *
-     * @since 1.5.0
-     * @access protected
-     */
-    protected function render_button() {
-        $settings = $this->get_settings_for_display();
+        /**
+         * Render button text.
+         *
+         * Render button widget text.
+         *
+         * @since 1.5.0
+         * @access protected
+         */
+        protected function render_button() {
+            $settings = $this->get_settings_for_display();
 
-        $this->add_render_attribute([
-            'content-wrapper' => [
-                'class' => ['elementor-button-content-wrapper', 'e-flexbox'],
-            ],
-            'icon-align' => [
-                'class' => [
-                    'elementor-button-icon',
-                    'elementor-align-icon-' . $settings['icon_align'],
+            $this->add_render_attribute([
+                'content-wrapper' => [
+                    'class' => ['elementor-button-content-wrapper', 'e-flexbox'],
                 ],
-            ],
-            'text' => [
-                'class' => 'elementor-button-text',
-            ],
-        ]);
+                'icon-align' => [
+                    'class' => [
+                        'elementor-button-icon',
+                        'elementor-align-icon-' . $settings['icon_align'],
+                    ],
+                ],
+                'text' => [
+                    'class' => 'elementor-button-text',
+                ],
+            ]);
 
-        $this->add_inline_editing_attributes('text', 'none');
-        ?>
+            if (!empty($settings['click_animation'])) {
+                $this->add_render_attribute('button', 'data-animation', $settings['click_animation']);
+            }
+            
+            $this->add_inline_editing_attributes('text', 'none');
+            ?>
         <button <?php echo $this->get_render_attribute_string('button'); ?>>
             <span <?php echo $this->get_render_attribute_string('content-wrapper'); ?>>
-                    <?php if (!empty($settings['icon']) || !empty($settings['selected_icon']['value'])) : ?>
+        <?php if (!empty($settings['icon']) || !empty($settings['selected_icon']['value'])) : ?>
                     <span <?php echo $this->get_render_attribute_string('icon-align'); ?>>
-                    <?php Icons_Manager::render_icon($settings['selected_icon'], ['aria-hidden' => 'true']); ?>
+            <?php Icons_Manager::render_icon($settings['selected_icon'], ['aria-hidden' => 'true']); ?>
                     </span>
-        <?php endif; ?>
+                <?php endif; ?>
                 <span <?php echo $this->get_render_attribute_string('text'); ?>><?php echo $settings['text']; ?></span>
             </span>
         </button>
-        <?php
-    }
+                <?php
+            }
 
-    public function on_import($element) {
-        return Icons_Manager::on_import_migration($element, 'icon', 'selected_icon');
-    }
+            public function on_import($element) {
+                return Icons_Manager::on_import_migration($element, 'icon', 'selected_icon');
+            }
 
-}
+        }
+        

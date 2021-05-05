@@ -6,7 +6,7 @@
  * Plugin Name:       e-addons COPY PASTE
  * Plugin URI:        https://e-addons.com
  * Description:       Copy and Paste elements between sites via the Clipboard
- * Version:           1.4.1
+ * Version:           1.4.2
  * Author:            Nerds Farm
  * Author URI:        https://nerds.farm
  * Text Domain:       e-addons-copy-paste
